@@ -7,6 +7,7 @@ import 'two_way_custom_scroll_view.dart';
 typedef TwoWayListViewItemBuilder<T> = Widget Function(
   BuildContext context,
   T item,
+  Animation<double> anim,
 );
 
 typedef _ItemBuilder<T> = Widget Function(
@@ -202,9 +203,9 @@ class _TwoWayListViewState<T> extends State<TwoWayListView<T>> {
     T item,
     Animation<double> anim,
   ) {
-    return SizeTransition(
-      sizeFactor: anim,
-      child: widget.itemBuilder(context, item),
+    return KeyedSubtree(
+      key: key,
+      child: widget.itemBuilder(context, item, anim),
     );
   }
 

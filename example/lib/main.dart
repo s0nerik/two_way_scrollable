@@ -172,7 +172,8 @@ class _ContentState extends State<_Content> {
           ),
         ),
       ),
-      itemBuilder: (context, item) => _Item(ctrl: ctrl, item: item),
+      itemBuilder: (context, item, anim) =>
+          _Item(ctrl: ctrl, item: item, animation: anim),
     );
   }
 }
@@ -182,10 +183,12 @@ class _Item extends StatefulWidget {
     Key? key,
     required this.ctrl,
     required this.item,
+    required this.animation,
   }) : super(key: key);
 
   final TwoWayListViewController<int> ctrl;
   final int item;
+  final Animation<double> animation;
 
   @override
   State<_Item> createState() => _ItemState();
@@ -229,28 +232,32 @@ class _ItemState extends State<_Item> {
       );
     }
 
-    return Container(
-      alignment: Alignment.center,
-      color: color,
-      height: 100 + widget.item % 4 * 60.0,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text('Item: ${widget.item}'),
-          if (!initialized)
-            Container(
-              width: 16,
-              height: 16,
-              margin: const EdgeInsets.only(left: 16, right: 16),
-              child: const CircularProgressIndicator(color: Colors.black),
-            ),
-          if (initialized)
-            IconButton(
-              key: ValueKey('remove:${widget.item}'),
-              icon: const Icon(Icons.delete),
-              onPressed: () => widget.ctrl.remove(widget.item),
-            )
-        ],
+    return SizeTransition(
+      sizeFactor: widget.animation,
+      axisAlignment: 0,
+      child: Container(
+        alignment: Alignment.center,
+        color: color,
+        height: 100 + widget.item % 4 * 60.0,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Item: ${widget.item}'),
+            if (!initialized)
+              Container(
+                width: 16,
+                height: 16,
+                margin: const EdgeInsets.only(left: 16, right: 16),
+                child: const CircularProgressIndicator(color: Colors.black),
+              ),
+            if (initialized)
+              IconButton(
+                key: ValueKey('remove:${widget.item}'),
+                icon: const Icon(Icons.delete),
+                onPressed: () => widget.ctrl.remove(widget.item),
+              )
+          ],
+        ),
       ),
     );
   }
