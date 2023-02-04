@@ -84,16 +84,8 @@ class TwoWayListViewController<T> with ChangeNotifier {
     _items.insert(adjustedIndex, item);
     _assignKey(item);
 
-    var insertedTop = false;
-
-    // This means that the bottom sliver fully covers the viewport, so now
-    // item can be added onto the top sliver.
     if (index < _center) {
       _center++;
-      insertedTop = true;
-    }
-
-    if (insertedTop) {
       final state = _topSliverKey.currentState!;
       final topIndex = _topIndex(adjustedIndex);
       state.insertItem(topIndex, duration: itemInsertDuration);
