@@ -78,7 +78,7 @@ class TwoWayListViewController<T> with ChangeNotifier {
   ///
   /// If [index] is smaller than [centerIndex], the item is guaranteed to be
   /// added to the top sliver.
-  void insert(int index, T item) {
+  void insert(int index, T item, {Duration? duration}) {
     final adjustedIndex = index < 0 ? 0 : index;
 
     _items.insert(adjustedIndex, item);
@@ -88,17 +88,17 @@ class TwoWayListViewController<T> with ChangeNotifier {
       _center++;
       final state = _topSliverKey.currentState!;
       final topIndex = _topIndex(adjustedIndex);
-      state.insertItem(topIndex, duration: itemInsertDuration);
+      state.insertItem(topIndex, duration: duration ?? itemInsertDuration);
     } else {
       final state = _bottomSliverKey.currentState!;
       final bottomIndex = _bottomIndex(adjustedIndex);
-      state.insertItem(bottomIndex, duration: itemInsertDuration);
+      state.insertItem(bottomIndex, duration: duration ?? itemInsertDuration);
     }
 
     notifyListeners();
   }
 
-  void remove(T item) {
+  void remove(T item, {Duration? duration}) {
     final itemIndex = _items.indexOf(item);
     if (itemIndex < 0) return;
 
@@ -119,7 +119,7 @@ class TwoWayListViewController<T> with ChangeNotifier {
     sliverKey.currentState?.removeItem(
       sectionIndex,
       (context, anim) => _itemBuilder!(context, key, item, anim),
-      duration: itemRemoveDuration,
+      duration: duration ?? itemRemoveDuration,
     );
 
     _unassignKey(item);
