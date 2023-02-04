@@ -104,30 +104,23 @@ class TwoWayListViewController<T> with ChangeNotifier {
 
     _items.removeAt(itemIndex);
 
-    var removedTop = false;
+    late final GlobalKey<SliverAnimatedListState> sliverKey;
     late final int sectionIndex;
     if (itemIndex < _center) {
       sectionIndex = _topIndex(itemIndex);
+      sliverKey = _topSliverKey;
       _center--;
-      removedTop = true;
     } else {
       sectionIndex = _bottomIndex(itemIndex);
+      sliverKey = _bottomSliverKey;
     }
 
     final key = _itemKeys[item]!;
-    if (removedTop) {
-      _topSliverKey.currentState?.removeItem(
-        sectionIndex,
-        (context, anim) => _itemBuilder!(context, key, item, anim),
-        duration: itemRemoveDuration,
-      );
-    } else {
-      _bottomSliverKey.currentState?.removeItem(
-        sectionIndex,
-        (context, anim) => _itemBuilder!(context, key, item, anim),
-        duration: itemRemoveDuration,
-      );
-    }
+    sliverKey.currentState?.removeItem(
+      sectionIndex,
+      (context, anim) => _itemBuilder!(context, key, item, anim),
+      duration: itemRemoveDuration,
+    );
 
     _unassignKey(item);
     notifyListeners();
