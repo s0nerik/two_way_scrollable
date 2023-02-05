@@ -1,5 +1,10 @@
 ## two_way_scrollable
 
+[![two_way_scrollable](https://img.shields.io/pub/v/two_way_scrollable)](https://pub.dev/packages/two_way_scrollable)
+[![two_way_scrollable](https://img.shields.io/pub/likes/two_way_scrollable)](https://pub.dev/packages/two_way_scrollable)
+[![two_way_scrollable](https://img.shields.io/pub/points/two_way_scrollable)](https://pub.dev/packages/two_way_scrollable)
+[![two_way_scrollable](https://img.shields.io/pub/popularity/two_way_scrollable)](https://pub.dev/packages/two_way_scrollable)
+
 A set of two-way growable widgets for Flutter that properly fill the viewport.
 
 ## Example
