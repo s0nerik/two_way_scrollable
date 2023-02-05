@@ -74,28 +74,46 @@ class TwoWayListViewController<T> with ChangeNotifier {
     return index - _center;
   }
 
-  /// Inserts an item into the list.
+  /// Inserts items into the list.
   ///
   /// If [index] is smaller than [centerIndex], the item is guaranteed to be
   /// added to the top sliver.
-  void insert(int index, T item, {Duration? duration}) {
+  void insertAll(int index, Iterable<T> items, {Duration? duration}) {
     final adjustedIndex = index < 0 ? 0 : index;
 
-    _items.insert(adjustedIndex, item);
-    _assignKey(item);
+    _items.insertAll(adjustedIndex, items);
 
     if (index < _center) {
-      _center++;
-      final state = _topSliverKey.currentState!;
-      final topIndex = _topIndex(adjustedIndex);
-      state.insertItem(topIndex, duration: duration ?? itemInsertDuration);
+      _center += items.length;
+      // Notify top sliver that items were added in reverse order
+      final reversedItems = items.toList().reversed;
+      var i = items.length - 1;
+      for (final item in reversedItems) {
+        _assignKey(item);
+        _topSliverKey.currentState!.insertItem(
+          _topIndex(adjustedIndex + i),
+          duration: duration ?? itemInsertDuration,
+        );
+        i--;
+      }
     } else {
-      final state = _bottomSliverKey.currentState!;
-      final bottomIndex = _bottomIndex(adjustedIndex);
-      state.insertItem(bottomIndex, duration: duration ?? itemInsertDuration);
+      var i = 0;
+      for (final item in items) {
+        _assignKey(item);
+        _bottomSliverKey.currentState!.insertItem(
+          _bottomIndex(adjustedIndex + i),
+          duration: duration ?? itemInsertDuration,
+        );
+        i++;
+      }
     }
 
     notifyListeners();
+  }
+
+  /// Same as [insertAll] but only inserts a single item.
+  void insert(int index, T item, {Duration? duration}) {
+    insertAll(index, [item], duration: duration);
   }
 
   void remove(T item, {Duration? duration}) {

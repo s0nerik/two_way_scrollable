@@ -78,10 +78,9 @@ class _ContentState extends State<_Content> {
             ctrl.insert(-1, first != null ? first - 1 : -1);
           },
           onLongPress: () {
-            for (var i = 0; i < 10; i++) {
-              final first = ctrl.items.firstOrNull;
-              ctrl.insert(-1, first != null ? first - 1 : -1);
-            }
+            final first = ctrl.items.firstOrNull ?? 0;
+            final items = List.generate(10, (i) => first - i - 1);
+            ctrl.insertAll(-1, items.reversed.toList());
           },
           child: const Icon(Icons.arrow_upward),
         ),
@@ -93,10 +92,9 @@ class _ContentState extends State<_Content> {
             ctrl.insert(ctrl.items.length, last != null ? last + 1 : 0);
           },
           onLongPress: () {
-            for (var i = 0; i < 10; i++) {
-              final last = ctrl.items.lastOrNull;
-              ctrl.insert(ctrl.items.length, last != null ? last + 1 : 0);
-            }
+            final last = ctrl.items.lastOrNull ?? -1;
+            final items = List.generate(10, (i) => last + i + 1);
+            ctrl.insertAll(ctrl.items.length, items);
           },
           child: const Icon(Icons.arrow_downward),
         ),
