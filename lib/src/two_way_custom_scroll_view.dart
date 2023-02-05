@@ -41,16 +41,14 @@ class TwoWayCustomScrollView extends CustomScrollView {
 
 class _Viewport extends Viewport {
   _Viewport({
-    super.key,
+    Key? key,
     super.axisDirection,
-    super.crossAxisDirection,
     required super.offset,
     required super.center,
     super.cacheExtent,
-    super.cacheExtentStyle,
     super.clipBehavior,
     required super.slivers,
-  }) : super(anchor: 0);
+  }) : super(key: key, anchor: 0);
 
   @override
   RenderViewport createRenderObject(BuildContext context) {
