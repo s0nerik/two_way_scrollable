@@ -151,7 +151,10 @@ class _ContentState extends State<_Content> {
     return TwoWayListView(
       controller: ctrl,
       showDebugIndicators: true,
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: EdgeInsets.only(
+        top: 16,
+        bottom: 16 + MediaQuery.of(context).padding.bottom,
+      ),
       reverse: widget.reverse,
       centerSliver: SliverToBoxAdapter(
         child: SizedBox(
