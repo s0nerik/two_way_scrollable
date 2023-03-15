@@ -170,7 +170,7 @@ class _ContentState extends State<_Content> {
           ),
         ),
       ),
-      itemBuilder: (context, item, anim) =>
+      itemBuilder: (context, index, item, anim) =>
           _Item(ctrl: ctrl, item: item, animation: anim),
     );
   }

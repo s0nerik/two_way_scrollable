@@ -6,6 +6,7 @@ import 'two_way_custom_scroll_view.dart';
 
 typedef TwoWayListViewItemBuilder<T> = Widget Function(
   BuildContext context,
+  int index,
   T item,
   Animation<double> anim,
 );
@@ -13,6 +14,7 @@ typedef TwoWayListViewItemBuilder<T> = Widget Function(
 typedef _ItemBuilder<T> = Widget Function(
   BuildContext context,
   Key key,
+  int index,
   T item,
   Animation<double> anim,
 );
@@ -136,7 +138,7 @@ class TwoWayListViewController<T> with ChangeNotifier {
     final key = _itemKeys[item]!;
     sliverKey.currentState?.removeItem(
       sectionIndex,
-      (context, anim) => _itemBuilder!(context, key, item, anim),
+      (context, anim) => _itemBuilder!(context, key, itemIndex, item, anim),
       duration: duration ?? itemRemoveDuration,
     );
 
@@ -203,12 +205,13 @@ class _TwoWayListViewState<T> extends State<TwoWayListView<T>> {
   Widget _itemBuilder(
     BuildContext context,
     Key key,
+    int index,
     T item,
     Animation<double> anim,
   ) {
     return KeyedSubtree(
       key: key,
-      child: widget.itemBuilder(context, item, anim),
+      child: widget.itemBuilder(context, index, item, anim),
     );
   }
 
@@ -247,7 +250,7 @@ class _TwoWayListViewState<T> extends State<TwoWayListView<T>> {
           itemBuilder: (context, index, anim) {
             final item = widget.controller._top[index];
             final key = widget.controller._itemKeys[item]!;
-            return _itemBuilder(context, key, item, anim);
+            return _itemBuilder(context, key, index, item, anim);
           },
         ),
         KeyedSubtree(
@@ -265,7 +268,7 @@ class _TwoWayListViewState<T> extends State<TwoWayListView<T>> {
           itemBuilder: (context, index, anim) {
             final item = widget.controller._bottom[index];
             final key = widget.controller._itemKeys[item]!;
-            return _itemBuilder(context, key, item, anim);
+            return _itemBuilder(context, key, index, item, anim);
           },
         ),
         SliverToBoxAdapter(
