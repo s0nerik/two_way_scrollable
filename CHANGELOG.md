@@ -1,3 +1,8 @@
+## 0.1.1
+
+- Removed unused debug parameter
+- Updated README.md
+
 ## 0.1.0
 
 - `TwoWayListView` now provides a way to specify slivers for every possible slot
