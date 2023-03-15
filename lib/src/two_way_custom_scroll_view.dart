@@ -13,13 +13,16 @@ class TwoWayCustomScrollView extends CustomScrollView {
     super.shrinkWrap,
     required Key super.center,
     super.cacheExtent,
-    super.slivers,
+    List<Widget> slivers = const <Widget>[],
     super.semanticChildCount,
     super.dragStartBehavior,
     super.keyboardDismissBehavior,
     super.restorationId,
     super.clipBehavior,
-  }) : super(anchor: 0);
+  }) : super(
+          anchor: 0,
+          slivers: slivers + const [_SliverBottomBoundary()],
+        );
 
   @override
   Widget buildViewport(
@@ -38,6 +41,17 @@ class TwoWayCustomScrollView extends CustomScrollView {
     );
   }
 }
+
+class _SliverBottomBoundary extends SliverToBoxAdapter {
+  const _SliverBottomBoundary({Key? key})
+      : super(key: key, child: const SizedBox.shrink());
+
+  @override
+  _RenderSliverBottomBoundary createRenderObject(BuildContext context) =>
+      _RenderSliverBottomBoundary();
+}
+
+class _RenderSliverBottomBoundary extends RenderSliverToBoxAdapter {}
 
 class _Viewport extends Viewport {
   _Viewport({
@@ -80,7 +94,7 @@ class _RenderViewport extends RenderViewport {
   void performLayout() {
     super.performLayout();
 
-    // Iteration order:
+    // `childrenInPaintOrder` iteration order example (based on TwoWayListView):
     //
     // --------- backward ----------
     // 0: debugTopListBoundary
@@ -88,24 +102,27 @@ class _RenderViewport extends RenderViewport {
     // 2: top
     // 3: topSliver
     // --------- forward ----------
-    // 4: debugBottomListBoundary
-    // 5: bottomPadding
-    // 6: bottom
-    // 7: bottomSliver
-    // 8: centerSliver
+    // 4: _SliverBottomBoundary
+    // 5: debugBottomListBoundary
+    // 6: bottomPadding
+    // 7: bottom
+    // 8: bottomSliver
+    // 9: centerSliver
     final iter = childrenInPaintOrder.iterator;
     double totalForwardScrollExtent = 0;
     double totalBackwardScrollExtent = 0;
-    var i = 0;
+    var isBackward = true;
     while (iter.moveNext()) {
-      assert(i < 9, 'There must be exactly 9 slivers in the CustomScrollView');
-      final sliverExtent = iter.current.geometry?.scrollExtent ?? 0;
-      if (i < 4) {
+      final renderObject = iter.current;
+      if (isBackward && renderObject is _RenderSliverBottomBoundary) {
+        isBackward = false;
+      }
+      final sliverExtent = renderObject.geometry?.scrollExtent ?? 0;
+      if (isBackward) {
         totalBackwardScrollExtent += sliverExtent;
       } else {
         totalForwardScrollExtent += sliverExtent;
       }
-      i++;
     }
     (offset as ScrollPosition).correctToEnsureViewportIsFilled(
       totalForwardScrollExtent,
