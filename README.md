@@ -16,6 +16,9 @@ A set of two-way growable widgets for Flutter that properly fill the viewport.
 - `TwoWayListView` - an `AnimatedListView` analog that properly grows in both directions.
 - `TwoWayCustomScrollView` - a `CustomScrollView` analog that properly grows in both directions.
 
+Note: these widgets don't provide a way to customize `anchor` parameter value, hardcoding it to be 0. If you need a
+bottom-to-top list, use `reverse: true` and provide list items in reverse order.
+
 ## Getting started
 
 ```shell
