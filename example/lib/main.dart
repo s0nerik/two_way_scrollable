@@ -24,7 +24,6 @@ class SandboxApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: _Content(
-        fillCenterFirst: true,
         reverse: reverse,
       ),
     );
@@ -34,11 +33,9 @@ class SandboxApp extends StatelessWidget {
 class _Content extends StatefulWidget {
   const _Content({
     Key? key,
-    required this.fillCenterFirst,
     required this.reverse,
   }) : super(key: key);
 
-  final bool fillCenterFirst;
   final bool reverse;
 
   @override
@@ -151,28 +148,61 @@ class _ContentState extends State<_Content> {
     return TwoWayListView(
       controller: ctrl,
       showDebugIndicators: true,
-      padding: const EdgeInsets.symmetric(vertical: 16),
       reverse: widget.reverse,
-      centerSliver: SliverToBoxAdapter(
-        child: SizedBox(
-          height: 4,
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Expanded(child: Container(color: Colors.red)),
-              Expanded(child: Container(color: Colors.orange)),
-              Expanded(child: Container(color: Colors.yellow)),
-              Expanded(child: Container(color: Colors.green)),
-              Expanded(child: Container(color: Colors.lightBlue)),
-              Expanded(child: Container(color: Colors.blue)),
-              Expanded(child: Container(color: Colors.purple)),
-            ],
-          ),
+      topSlivers: const [
+        SliverToBoxAdapter(
+          child: _DebugListBoundaryIndicator(),
         ),
+        SliverToBoxAdapter(
+          child: SizedBox(height: 16),
+        ),
+      ],
+      centerSliver: const SliverToBoxAdapter(
+        child: _DebugCenterIndicator(),
       ),
+      bottomSlivers: const [
+        SliverToBoxAdapter(
+          child: SizedBox(height: 16),
+        ),
+        SliverToBoxAdapter(
+          child: _DebugListBoundaryIndicator(),
+        ),
+      ],
       itemBuilder: (context, index, item, anim) =>
           _Item(ctrl: ctrl, item: item, animation: anim),
     );
+  }
+}
+
+class _DebugCenterIndicator extends StatelessWidget {
+  const _DebugCenterIndicator({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 4,
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Expanded(child: Container(color: Colors.red)),
+          Expanded(child: Container(color: Colors.orange)),
+          Expanded(child: Container(color: Colors.yellow)),
+          Expanded(child: Container(color: Colors.green)),
+          Expanded(child: Container(color: Colors.lightBlue)),
+          Expanded(child: Container(color: Colors.blue)),
+          Expanded(child: Container(color: Colors.purple)),
+        ],
+      ),
+    );
+  }
+}
+
+class _DebugListBoundaryIndicator extends StatelessWidget {
+  const _DebugListBoundaryIndicator({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(height: 4, color: Colors.red);
   }
 }
 

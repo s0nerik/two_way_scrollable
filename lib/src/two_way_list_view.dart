@@ -30,14 +30,14 @@ class TwoWayListViewController<T> with ChangeNotifier {
 
   _ItemBuilder<T>? _itemBuilder;
 
-  final _topSliverKey = GlobalKey<SliverAnimatedListState>(
-    debugLabel: 'TwoWayListView.topSliver',
+  final _topItemsSliverKey = GlobalKey<SliverAnimatedListState>(
+    debugLabel: 'TwoWayListView.topItemsSliver',
   );
   final _centerSliverKey = GlobalKey(
     debugLabel: 'TwoWayListView.centerSliver',
   );
-  final _bottomSliverKey = GlobalKey<SliverAnimatedListState>(
-    debugLabel: 'TwoWayListView.bottomSliver',
+  final _bottomItemsSliverKey = GlobalKey<SliverAnimatedListState>(
+    debugLabel: 'TwoWayListView.bottomItemsSliver',
   );
 
   var _center = 0;
@@ -92,7 +92,7 @@ class TwoWayListViewController<T> with ChangeNotifier {
       var i = items.length - 1;
       for (final item in reversedItems) {
         _assignKey(item);
-        _topSliverKey.currentState!.insertItem(
+        _topItemsSliverKey.currentState!.insertItem(
           _topIndex(adjustedIndex + i),
           duration: duration ?? itemInsertDuration,
         );
@@ -102,7 +102,7 @@ class TwoWayListViewController<T> with ChangeNotifier {
       var i = 0;
       for (final item in items) {
         _assignKey(item);
-        _bottomSliverKey.currentState!.insertItem(
+        _bottomItemsSliverKey.currentState!.insertItem(
           _bottomIndex(adjustedIndex + i),
           duration: duration ?? itemInsertDuration,
         );
@@ -128,11 +128,11 @@ class TwoWayListViewController<T> with ChangeNotifier {
     late final int sectionIndex;
     if (itemIndex < _center) {
       sectionIndex = _topIndex(itemIndex);
-      sliverKey = _topSliverKey;
+      sliverKey = _topItemsSliverKey;
       _center--;
     } else {
       sectionIndex = _bottomIndex(itemIndex);
-      sliverKey = _bottomSliverKey;
+      sliverKey = _bottomItemsSliverKey;
     }
 
     final key = _itemKeys[item]!;
@@ -152,20 +152,34 @@ class TwoWayListView<T> extends StatefulWidget {
     Key? key,
     required this.controller,
     required this.itemBuilder,
+    this.topSlivers = const [],
+    this.aboveCenterSlivers = const [],
     this.centerSliver,
-    this.top,
-    this.bottom,
-    this.padding = EdgeInsets.zero,
+    this.belowCenterSlivers = const [],
+    this.bottomSlivers = const [],
     this.reverse = false,
     this.showDebugIndicators = false,
   }) : super(key: key);
 
   final TwoWayListViewController<T> controller;
   final TwoWayListViewItemBuilder<T> itemBuilder;
+
+  /// Slivers placed conceptually above items.
+  final List<Widget> topSlivers;
+
+  /// Slivers placed conceptually above the [centerSliver], but below the
+  /// "above center" list items.
+  final List<Widget> aboveCenterSlivers;
+
+  /// Sliver placed in-between the "above center" and "below center" list items.
   final Widget? centerSliver;
-  final Widget? top;
-  final Widget? bottom;
-  final EdgeInsetsGeometry padding;
+
+  /// Slivers placed conceptually below the [centerSliver], but above the
+  /// "below center" list items.
+  final List<Widget> belowCenterSlivers;
+
+  /// Slivers placed conceptually below items.
+  final List<Widget> bottomSlivers;
   final bool reverse;
   final bool showDebugIndicators;
 
@@ -217,31 +231,13 @@ class _TwoWayListViewState<T> extends State<TwoWayListView<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final directionality = Directionality.of(context);
-    var padding = widget.padding.resolve(directionality);
-
     return TwoWayCustomScrollView(
       center: widget.controller._centerSliverKey,
       reverse: widget.reverse,
       slivers: [
-        SliverToBoxAdapter(
-          key: const Key('debugTopListBoundary'),
-          child: widget.showDebugIndicators
-              ? const _ListBoundaryDebugIndicator()
-              : const SizedBox.shrink(),
-        ),
-        SliverToBoxAdapter(
-          key: const Key('topPadding'),
-          child: padding.top != 0
-              ? SizedBox(height: padding.top)
-              : const SizedBox.shrink(),
-        ),
-        SliverToBoxAdapter(
-          key: const Key('top'),
-          child: widget.top != null ? widget.top! : const SizedBox.shrink(),
-        ),
+        ...widget.topSlivers,
         SliverAnimatedList(
-          key: widget.controller._topSliverKey,
+          key: widget.controller._topItemsSliverKey,
           findChildIndexCallback: (key) {
             final item = widget.controller._keyedItems[key];
             if (item == null) return null;
@@ -253,13 +249,15 @@ class _TwoWayListViewState<T> extends State<TwoWayListView<T>> {
             return _itemBuilder(context, key, index, item, anim);
           },
         ),
+        ...widget.aboveCenterSlivers,
         KeyedSubtree(
           key: widget.controller._centerSliverKey,
           child: widget.centerSliver ??
               const SliverToBoxAdapter(child: SizedBox.shrink()),
         ),
+        ...widget.belowCenterSlivers,
         SliverAnimatedList(
-          key: widget.controller._bottomSliverKey,
+          key: widget.controller._bottomItemsSliverKey,
           findChildIndexCallback: (key) {
             final item = widget.controller._keyedItems[key];
             if (item == null) return null;
@@ -271,33 +269,8 @@ class _TwoWayListViewState<T> extends State<TwoWayListView<T>> {
             return _itemBuilder(context, key, index, item, anim);
           },
         ),
-        SliverToBoxAdapter(
-          key: const Key('bottom'),
-          child:
-              widget.bottom != null ? widget.bottom! : const SizedBox.shrink(),
-        ),
-        SliverToBoxAdapter(
-          key: const Key('bottomPadding'),
-          child: padding.bottom != 0
-              ? SizedBox(height: padding.bottom)
-              : const SizedBox.shrink(),
-        ),
-        SliverToBoxAdapter(
-          key: const Key('debugBottomListBoundary'),
-          child: widget.showDebugIndicators
-              ? const _ListBoundaryDebugIndicator()
-              : const SizedBox.shrink(),
-        ),
+        ...widget.bottomSlivers,
       ],
     );
-  }
-}
-
-class _ListBoundaryDebugIndicator extends StatelessWidget {
-  const _ListBoundaryDebugIndicator({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(height: 4, color: Colors.red);
   }
 }
