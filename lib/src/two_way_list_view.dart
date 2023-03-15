@@ -158,7 +158,6 @@ class TwoWayListView<T> extends StatefulWidget {
     this.belowCenterSlivers = const [],
     this.bottomSlivers = const [],
     this.reverse = false,
-    this.showDebugIndicators = false,
   }) : super(key: key);
 
   final TwoWayListViewController<T> controller;
@@ -181,7 +180,6 @@ class TwoWayListView<T> extends StatefulWidget {
   /// Slivers placed conceptually below items.
   final List<Widget> bottomSlivers;
   final bool reverse;
-  final bool showDebugIndicators;
 
   @override
   State<TwoWayListView<T>> createState() => _TwoWayListViewState<T>();

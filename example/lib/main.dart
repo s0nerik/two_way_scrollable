@@ -147,7 +147,6 @@ class _ContentState extends State<_Content> {
   Widget buildListView() {
     return TwoWayListView(
       controller: ctrl,
-      showDebugIndicators: true,
       reverse: widget.reverse,
       topSlivers: const [
         SliverToBoxAdapter(
