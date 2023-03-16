@@ -54,9 +54,6 @@ class _SliverItemsSection<T> extends StatefulWidget {
 }
 
 class _SliverItemsSectionState<T> extends State<_SliverItemsSection<T>> {
-  late final keyedItems = widget.controller.keyedItems;
-  late final itemKeys = widget.controller.itemKeys;
-
   List<T> get items {
     switch (widget.type) {
       case _SliverItemsSectionType.top:
@@ -93,7 +90,7 @@ class _SliverItemsSectionState<T> extends State<_SliverItemsSection<T>> {
   }
 
   int? _findChildIndexCallback(Key key) {
-    final item = keyedItems[key];
+    final item = widget.controller.keyedItems[key];
     if (item == null) return null;
     return items.indexOf(item);
   }
@@ -104,7 +101,7 @@ class _SliverItemsSectionState<T> extends State<_SliverItemsSection<T>> {
     Animation<double> animation,
   ) {
     final item = items[index];
-    final key = itemKeys[item]!;
+    final key = widget.controller.itemKeys[item]!;
     return KeyedSubtree(
       key: key,
       child: widget.itemBuilder(context, index, item, animation),
