@@ -18,6 +18,7 @@ class TwoWayListView<T> extends StatefulWidget {
 
   final TwoWayListViewController<T> controller;
   final TwoWayListViewItemBuilder<T> itemBuilder;
+  final bool reverse;
 
   /// Slivers placed conceptually above items.
   final List<Widget> topSlivers;
@@ -35,7 +36,6 @@ class TwoWayListView<T> extends StatefulWidget {
 
   /// Slivers placed conceptually below items.
   final List<Widget> bottomSlivers;
-  final bool reverse;
 
   @override
   State<TwoWayListView<T>> createState() => _TwoWayListViewState<T>();
