@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
+import 'package:two_way_scrollable/src/list_view/sliver_two_way_list_view.dart';
 
 import '../util/reversed_list_view.dart';
 
@@ -30,13 +31,13 @@ class TwoWayListViewController<T> with ChangeNotifier {
   final Duration itemRemoveDuration;
 
   @internal
-  RemovedItemBuilder<T>? removedTopItemBuilder;
-  @internal
-  RemovedItemBuilder<T>? removedBottomItemBuilder;
+  final topItemsSliverKey = GlobalKey<SliverItemsSectionState<T>>(
+    debugLabel: 'TwoWayListView.topItemsSliver',
+  );
 
   @internal
-  final topItemsSliverKey = GlobalKey<SliverAnimatedListState>(
-    debugLabel: 'TwoWayListView.topItemsSliver',
+  final topItemsAnimatedListSliverKey = GlobalKey<SliverAnimatedListState>(
+    debugLabel: 'TwoWayListView.topItemsAnimatedListSliver',
   );
 
   @internal
@@ -45,8 +46,13 @@ class TwoWayListViewController<T> with ChangeNotifier {
   );
 
   @internal
-  final bottomItemsSliverKey = GlobalKey<SliverAnimatedListState>(
+  final bottomItemsSliverKey = GlobalKey<SliverItemsSectionState<T>>(
     debugLabel: 'TwoWayListView.bottomItemsSliver',
+  );
+
+  @internal
+  final bottomItemsAnimatedListSliverKey = GlobalKey<SliverAnimatedListState>(
+    debugLabel: 'TwoWayListView.bottomItemsAnimatedListSliver',
   );
 
   var _center = 0;
@@ -102,33 +108,41 @@ class TwoWayListViewController<T> with ChangeNotifier {
     _items.insertAll(adjustedIndex, items);
 
     if (index < _center) {
-      assert(topItemsSliverKey.currentState != null, '''
-        Tried to insert items into the top sliver, but the top sliver is not
-        attached to the tree. Did you forget to include the
-        `SliverTwoWayListView.top` within `CustomScrollView.slivers`?
-      ''');
+      assert(
+        topItemsAnimatedListSliverKey.currentState != null &&
+            topItemsSliverKey.currentState != null,
+        '''
+          Tried to insert items into the top sliver, but the top sliver is not
+          attached to the tree. Did you forget to include the
+          `SliverTwoWayListView.top` within `CustomScrollView.slivers`?
+        ''',
+      );
       _center += items.length;
       // Notify top sliver that items were added in reverse order
       final reversedItems = items.toList().reversed;
       var i = items.length - 1;
       for (final item in reversedItems) {
         _assignKey(item);
-        topItemsSliverKey.currentState!.insertItem(
+        topItemsAnimatedListSliverKey.currentState!.insertItem(
           _topIndex(adjustedIndex + i),
           duration: duration ?? itemInsertDuration,
         );
         i--;
       }
     } else {
-      assert(bottomItemsSliverKey.currentState != null, '''
-        Tried to insert items into the bottom sliver, but the bottom sliver is
-        not attached to the tree. Did you forget to include the
-        `SliverTwoWayListView.bottom` within `CustomScrollView.slivers`?
-      ''');
+      assert(
+        bottomItemsAnimatedListSliverKey.currentState != null &&
+            bottomItemsSliverKey.currentState != null,
+        '''
+          Tried to insert items into the bottom sliver, but the bottom sliver is
+          not attached to the tree. Did you forget to include the
+          `SliverTwoWayListView.bottom` within `CustomScrollView.slivers`?
+        ''',
+      );
       var i = 0;
       for (final item in items) {
         _assignKey(item);
-        bottomItemsSliverKey.currentState!.insertItem(
+        bottomItemsAnimatedListSliverKey.currentState!.insertItem(
           _bottomIndex(adjustedIndex + i),
           duration: duration ?? itemInsertDuration,
         );
@@ -154,24 +168,33 @@ class TwoWayListViewController<T> with ChangeNotifier {
     late final int sectionIndex;
     late final RemovedItemBuilder<T> removedItemBuilder;
     if (itemIndex < _center) {
-      assert(topItemsSliverKey.currentState != null, '''
-        Tried to remove items from the top sliver, but the top sliver is not
-        attached to the tree. Did you forget to include the
-        `SliverTwoWayListView.top` within `CustomScrollView.slivers`?
-      ''');
+      assert(
+        topItemsAnimatedListSliverKey.currentState != null &&
+            topItemsSliverKey.currentState != null,
+        '''
+          Tried to remove items from the top sliver, but the top sliver is not
+          attached to the tree. Did you forget to include the
+          `SliverTwoWayListView.top` within `CustomScrollView.slivers`?
+        ''',
+      );
       sectionIndex = _topIndex(itemIndex);
-      sliverKey = topItemsSliverKey;
-      removedItemBuilder = removedTopItemBuilder!;
+      sliverKey = topItemsAnimatedListSliverKey;
+      removedItemBuilder = topItemsSliverKey.currentState!.removedItemBuilder;
       _center--;
     } else {
-      assert(bottomItemsSliverKey.currentState != null, '''
-        Tried to remove items from the bottom sliver, but the bottom sliver is
-        not attached to the tree. Did you forget to include the
-        `SliverTwoWayListView.bottom` within `CustomScrollView.slivers`?
-      ''');
+      assert(
+        bottomItemsAnimatedListSliverKey.currentState != null &&
+            bottomItemsSliverKey.currentState != null,
+        '''
+          Tried to remove items from the bottom sliver, but the bottom sliver is
+          not attached to the tree. Did you forget to include the
+          `SliverTwoWayListView.bottom` within `CustomScrollView.slivers`?
+        ''',
+      );
       sectionIndex = _bottomIndex(itemIndex);
-      sliverKey = bottomItemsSliverKey;
-      removedItemBuilder = removedBottomItemBuilder!;
+      sliverKey = bottomItemsAnimatedListSliverKey;
+      removedItemBuilder =
+          bottomItemsSliverKey.currentState!.removedItemBuilder;
     }
 
     final key = _itemKeys[item]!;

@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:meta/meta.dart';
 import 'package:two_way_scrollable/src/list_view/two_way_list_view_controller.dart';
 
 abstract class SliverTwoWayListView {
@@ -7,7 +8,7 @@ abstract class SliverTwoWayListView {
     required TwoWayListViewItemBuilder<T> itemBuilder,
   }) =>
       _SliverItemsSection<T>(
-        key: const Key('SliverTwoWayListView.topItemsSection'),
+        key: controller.topItemsSliverKey,
         type: _SliverItemsSectionType.top,
         controller: controller,
         itemBuilder: itemBuilder,
@@ -28,7 +29,7 @@ abstract class SliverTwoWayListView {
     required TwoWayListViewItemBuilder<T> itemBuilder,
   }) =>
       _SliverItemsSection<T>(
-        key: const Key('SliverTwoWayListView.bottomItemsSection'),
+        key: controller.bottomItemsSliverKey,
         type: _SliverItemsSectionType.bottom,
         controller: controller,
         itemBuilder: itemBuilder,
@@ -50,10 +51,13 @@ class _SliverItemsSection<T> extends StatefulWidget {
   final TwoWayListViewItemBuilder<T> itemBuilder;
 
   @override
-  State<_SliverItemsSection<T>> createState() => _SliverItemsSectionState<T>();
+  State<_SliverItemsSection<T>> createState() => SliverItemsSectionState<T>._();
 }
 
-class _SliverItemsSectionState<T> extends State<_SliverItemsSection<T>> {
+@internal
+class SliverItemsSectionState<T> extends State<_SliverItemsSection<T>> {
+  SliverItemsSectionState._();
+
   List<T> get items {
     switch (widget.type) {
       case _SliverItemsSectionType.top:
@@ -61,32 +65,6 @@ class _SliverItemsSectionState<T> extends State<_SliverItemsSection<T>> {
       case _SliverItemsSectionType.bottom:
         return widget.controller.bottom;
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    switch (widget.type) {
-      case _SliverItemsSectionType.top:
-        widget.controller.removedTopItemBuilder = _removedItemBuilder;
-        break;
-      case _SliverItemsSectionType.bottom:
-        widget.controller.removedBottomItemBuilder = _removedItemBuilder;
-        break;
-    }
-  }
-
-  @override
-  void dispose() {
-    switch (widget.type) {
-      case _SliverItemsSectionType.top:
-        widget.controller.removedTopItemBuilder = null;
-        break;
-      case _SliverItemsSectionType.bottom:
-        widget.controller.removedBottomItemBuilder = null;
-        break;
-    }
-    super.dispose();
   }
 
   int? _findChildIndexCallback(Key key) {
@@ -108,7 +86,7 @@ class _SliverItemsSectionState<T> extends State<_SliverItemsSection<T>> {
     );
   }
 
-  Widget _removedItemBuilder(
+  Widget removedItemBuilder(
     BuildContext context,
     Key key,
     int index,
@@ -124,8 +102,8 @@ class _SliverItemsSectionState<T> extends State<_SliverItemsSection<T>> {
   Widget build(BuildContext context) {
     return SliverAnimatedList(
       key: widget.type == _SliverItemsSectionType.top
-          ? widget.controller.topItemsSliverKey
-          : widget.controller.bottomItemsSliverKey,
+          ? widget.controller.topItemsAnimatedListSliverKey
+          : widget.controller.bottomItemsAnimatedListSliverKey,
       findChildIndexCallback: _findChildIndexCallback,
       itemBuilder: _itemBuilder,
     );
