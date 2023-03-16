@@ -100,6 +100,11 @@ class TwoWayListViewController<T> with ChangeNotifier {
     _items.insertAll(adjustedIndex, items);
 
     if (index < _center) {
+      assert(topItemsSliverKey.currentState != null, '''
+        Tried to insert items into the top sliver, but the top sliver is not
+        attached to the tree. Did you forget to include the
+        `SliverTwoWayListView.top` within `CustomScrollView.slivers`?
+      ''');
       _center += items.length;
       // Notify top sliver that items were added in reverse order
       final reversedItems = items.toList().reversed;
@@ -113,6 +118,11 @@ class TwoWayListViewController<T> with ChangeNotifier {
         i--;
       }
     } else {
+      assert(bottomItemsSliverKey.currentState != null, '''
+        Tried to insert items into the bottom sliver, but the bottom sliver is
+        not attached to the tree. Did you forget to include the
+        `SliverTwoWayListView.bottom` within `CustomScrollView.slivers`?
+      ''');
       var i = 0;
       for (final item in items) {
         _assignKey(item);
@@ -141,10 +151,20 @@ class TwoWayListViewController<T> with ChangeNotifier {
     late final GlobalKey<SliverAnimatedListState> sliverKey;
     late final int sectionIndex;
     if (itemIndex < _center) {
+      assert(topItemsSliverKey.currentState != null, '''
+        Tried to remove items from the top sliver, but the top sliver is not
+        attached to the tree. Did you forget to include the
+        `SliverTwoWayListView.top` within `CustomScrollView.slivers`?
+      ''');
       sectionIndex = _topIndex(itemIndex);
       sliverKey = topItemsSliverKey;
       _center--;
     } else {
+      assert(bottomItemsSliverKey.currentState != null, '''
+        Tried to remove items from the bottom sliver, but the bottom sliver is
+        not attached to the tree. Did you forget to include the
+        `SliverTwoWayListView.bottom` within `CustomScrollView.slivers`?
+      ''');
       sectionIndex = _bottomIndex(itemIndex);
       sliverKey = bottomItemsSliverKey;
     }
