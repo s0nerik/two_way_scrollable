@@ -30,7 +30,9 @@ class TwoWayListViewController<T> with ChangeNotifier {
   final Duration itemRemoveDuration;
 
   @internal
-  RemovedItemBuilder<T>? removedItemBuilder;
+  RemovedItemBuilder<T>? removedTopItemBuilder;
+  @internal
+  RemovedItemBuilder<T>? removedBottomItemBuilder;
 
   @internal
   final topItemsSliverKey = GlobalKey<SliverAnimatedListState>(
@@ -150,6 +152,7 @@ class TwoWayListViewController<T> with ChangeNotifier {
 
     late final GlobalKey<SliverAnimatedListState> sliverKey;
     late final int sectionIndex;
+    late final RemovedItemBuilder<T> removedItemBuilder;
     if (itemIndex < _center) {
       assert(topItemsSliverKey.currentState != null, '''
         Tried to remove items from the top sliver, but the top sliver is not
@@ -158,6 +161,7 @@ class TwoWayListViewController<T> with ChangeNotifier {
       ''');
       sectionIndex = _topIndex(itemIndex);
       sliverKey = topItemsSliverKey;
+      removedItemBuilder = removedTopItemBuilder!;
       _center--;
     } else {
       assert(bottomItemsSliverKey.currentState != null, '''
@@ -167,13 +171,14 @@ class TwoWayListViewController<T> with ChangeNotifier {
       ''');
       sectionIndex = _bottomIndex(itemIndex);
       sliverKey = bottomItemsSliverKey;
+      removedItemBuilder = removedBottomItemBuilder!;
     }
 
     final key = _itemKeys[item]!;
     sliverKey.currentState?.removeItem(
       sectionIndex,
       (context, anim) =>
-          removedItemBuilder!(context, key, itemIndex, item, anim),
+          removedItemBuilder(context, key, itemIndex, item, anim),
       duration: duration ?? itemRemoveDuration,
     );
 

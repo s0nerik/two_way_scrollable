@@ -67,12 +67,26 @@ class _SliverItemsSectionState<T> extends State<_SliverItemsSection<T>> {
   @override
   void initState() {
     super.initState();
-    widget.controller.removedItemBuilder = _removedItemBuilder;
+    switch (widget.type) {
+      case _SliverItemsSectionType.top:
+        widget.controller.removedTopItemBuilder = _removedItemBuilder;
+        break;
+      case _SliverItemsSectionType.bottom:
+        widget.controller.removedBottomItemBuilder = _removedItemBuilder;
+        break;
+    }
   }
 
   @override
   void dispose() {
-    widget.controller.removedItemBuilder = null;
+    switch (widget.type) {
+      case _SliverItemsSectionType.top:
+        widget.controller.removedTopItemBuilder = null;
+        break;
+      case _SliverItemsSectionType.bottom:
+        widget.controller.removedBottomItemBuilder = null;
+        break;
+    }
     super.dispose();
   }
 
