@@ -11,7 +11,6 @@ dependencies:
   flutter:
     sdk: flutter
   collection: ^1.17.0
-  sliver_tools: ^0.2.9
   meta:
 
 dev_dependencies:
