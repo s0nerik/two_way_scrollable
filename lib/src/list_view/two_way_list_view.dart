@@ -93,7 +93,7 @@ class TwoWayListView<T> extends StatelessWidget {
   List<Widget> _buildBottomToTopSlivers(TwoWayListViewAnchor anchor) {
     switch (anchor) {
       case TwoWayListViewAnchor.top:
-        throw UnimplementedError();
+        return _buildTopToBottomSlivers(TwoWayListViewAnchor.bottom);
       case TwoWayListViewAnchor.bottom:
         return _buildTopToBottomSlivers(TwoWayListViewAnchor.top);
     }
