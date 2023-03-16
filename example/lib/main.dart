@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:random_color/random_color.dart';
 import 'package:two_way_scrollable/two_way_scrollable.dart';
 
@@ -14,17 +15,20 @@ void main() {
 class SandboxApp extends StatelessWidget {
   const SandboxApp({
     super.key,
-    this.reverse = false,
+    this.anchor = TwoWayListViewAnchor.top,
+    this.direction = TwoWayListViewDirection.topToBottom,
   });
 
-  final bool reverse;
+  final TwoWayListViewAnchor anchor;
+  final TwoWayListViewDirection direction;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: _Content(
-        reverse: reverse,
+        anchor: anchor,
+        direction: direction,
       ),
     );
   }
@@ -33,10 +37,12 @@ class SandboxApp extends StatelessWidget {
 class _Content extends StatefulWidget {
   const _Content({
     Key? key,
-    required this.reverse,
+    required this.anchor,
+    required this.direction,
   }) : super(key: key);
 
-  final bool reverse;
+  final TwoWayListViewAnchor anchor;
+  final TwoWayListViewDirection direction;
 
   @override
   State<_Content> createState() => _ContentState();
@@ -44,6 +50,9 @@ class _Content extends StatefulWidget {
 
 class _ContentState extends State<_Content> {
   var ctrl = TwoWayListViewController<int>();
+
+  late var anchor = widget.anchor;
+  late var direction = widget.direction;
 
   @override
   Widget build(BuildContext context) {
@@ -63,11 +72,9 @@ class _ContentState extends State<_Content> {
 
   AppBar buildAppBar() {
     return AppBar(
-      title: const Text('CustomScrollView with `center`'),
       centerTitle: false,
       actions: [
-        const Icon(Icons.add_circle),
-        const SizedBox(width: 8),
+        const Icon(MdiIcons.plusBox),
         InkResponse(
           key: const ValueKey('add-first'),
           onTap: () {
@@ -79,9 +86,8 @@ class _ContentState extends State<_Content> {
             final items = List.generate(10, (i) => first - i - 1);
             ctrl.insertAll(-1, items.reversed.toList());
           },
-          child: const Icon(Icons.arrow_upward),
+          child: const Icon(MdiIcons.triangleSmallUp),
         ),
-        const SizedBox(width: 8),
         InkResponse(
           key: const ValueKey('add-last'),
           onTap: () {
@@ -93,11 +99,10 @@ class _ContentState extends State<_Content> {
             final items = List.generate(10, (i) => last + i + 1);
             ctrl.insertAll(ctrl.items.length, items);
           },
-          child: const Icon(Icons.arrow_downward),
+          child: const Icon(MdiIcons.triangleSmallDown),
         ),
-        const SizedBox(width: 24),
-        const Icon(Icons.remove_circle),
         const SizedBox(width: 8),
+        const Icon(MdiIcons.minusBox),
         InkResponse(
           key: const ValueKey('remove-first'),
           onTap: () {
@@ -112,9 +117,8 @@ class _ContentState extends State<_Content> {
               ctrl.remove(item);
             }
           },
-          child: const Icon(Icons.arrow_upward),
+          child: const Icon(MdiIcons.triangleSmallUp),
         ),
-        const SizedBox(width: 8),
         InkResponse(
           key: const ValueKey('remove-last'),
           onTap: () {
@@ -129,25 +133,79 @@ class _ContentState extends State<_Content> {
               ctrl.remove(item);
             }
           },
-          child: const Icon(Icons.arrow_downward),
+          child: const Icon(MdiIcons.triangleSmallDown),
         ),
-        const SizedBox(width: 24),
+        const SizedBox(width: 8),
+        InkResponse(
+          key: const ValueKey('anchor'),
+          onTap: () => setState(() {
+            _swapAnchor();
+          }),
+          child: anchor == TwoWayListViewAnchor.top
+              ? const Icon(MdiIcons.alignVerticalTop)
+              : const Icon(MdiIcons.alignVerticalBottom),
+        ),
+        const SizedBox(width: 8),
+        InkResponse(
+          key: const ValueKey('direction'),
+          onTap: () => setState(() {
+            _swapDirection();
+          }),
+          child: direction == TwoWayListViewDirection.topToBottom
+              ? const Icon(MdiIcons.sortAscending)
+              : const Icon(MdiIcons.sortDescending),
+        ),
+        const SizedBox(width: 8),
+        InkResponse(
+          key: const ValueKey('reverse'),
+          onTap: () => setState(() {
+            _swapAnchor();
+            _swapDirection();
+          }),
+          child: const Icon(MdiIcons.swapVertical),
+        ),
+        const SizedBox(width: 8),
         InkResponse(
           key: const ValueKey('refresh'),
           onTap: () => setState(() {
             ctrl = TwoWayListViewController<int>();
+            direction = TwoWayListViewDirection.topToBottom;
+            anchor = TwoWayListViewAnchor.top;
           }),
-          child: const Icon(Icons.refresh),
+          child: const Icon(MdiIcons.refresh),
         ),
         const SizedBox(width: 16),
       ],
     );
   }
 
+  void _swapAnchor() {
+    switch (anchor) {
+      case TwoWayListViewAnchor.top:
+        anchor = TwoWayListViewAnchor.bottom;
+        break;
+      case TwoWayListViewAnchor.bottom:
+        anchor = TwoWayListViewAnchor.top;
+        break;
+    }
+  }
+
+  void _swapDirection() {
+    switch (direction) {
+      case TwoWayListViewDirection.topToBottom:
+        direction = TwoWayListViewDirection.bottomToTop;
+        break;
+      case TwoWayListViewDirection.bottomToTop:
+        direction = TwoWayListViewDirection.topToBottom;
+        break;
+    }
+  }
+
   Widget buildListView() {
     return TwoWayListView(
       controller: ctrl,
-      reverse: widget.reverse,
+      anchor: anchor,
+      direction: direction,
       topSlivers: const [
         SliverToBoxAdapter(
           child: _DebugListBoundaryIndicator(),

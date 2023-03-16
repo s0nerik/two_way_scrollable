@@ -4,12 +4,17 @@ import 'package:two_way_scrollable/src/list_view/sliver_two_way_list_view.dart';
 import '../two_way_custom_scroll_view.dart';
 import 'two_way_list_view_controller.dart';
 
+enum TwoWayListViewAnchor { top, bottom }
+
+enum TwoWayListViewDirection { topToBottom, bottomToTop }
+
 class TwoWayListView<T> extends StatelessWidget {
   const TwoWayListView({
     Key? key,
     required this.controller,
     required this.itemBuilder,
-    this.reverse = false,
+    this.anchor = TwoWayListViewAnchor.top,
+    this.direction = TwoWayListViewDirection.topToBottom,
     this.topSlivers = const [],
     this.aboveCenterSlivers = const [],
     this.centerSliver,
@@ -19,7 +24,8 @@ class TwoWayListView<T> extends StatelessWidget {
 
   final TwoWayListViewController<T> controller;
   final TwoWayListViewItemBuilder<T> itemBuilder;
-  final bool reverse;
+  final TwoWayListViewAnchor anchor;
+  final TwoWayListViewDirection direction;
 
   /// Slivers placed conceptually above items.
   final List<Widget> topSlivers;
@@ -42,25 +48,52 @@ class TwoWayListView<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return TwoWayCustomScrollView(
       center: controller.centerSliverKey,
-      reverse: reverse,
-      slivers: [
-        ...topSlivers,
-        SliverTwoWayListView.top(
-          controller: controller,
-          itemBuilder: itemBuilder,
-        ),
-        ...aboveCenterSlivers,
-        SliverTwoWayListView.center(
-          controller: controller,
-          centerSliver: centerSliver,
-        ),
-        ...belowCenterSlivers,
-        SliverTwoWayListView.bottom(
-          controller: controller,
-          itemBuilder: itemBuilder,
-        ),
-        ...bottomSlivers,
-      ],
+      reverse: anchor == TwoWayListViewAnchor.bottom,
+      slivers: _buildSlivers(),
     );
+  }
+
+  List<Widget> _buildSlivers() {
+    switch (direction) {
+      case TwoWayListViewDirection.topToBottom:
+        return _buildTopToBottomSlivers(anchor);
+      case TwoWayListViewDirection.bottomToTop:
+        return _buildBottomToTopSlivers(anchor);
+    }
+  }
+
+  List<Widget> _buildTopToBottomSlivers(TwoWayListViewAnchor anchor) {
+    switch (anchor) {
+      case TwoWayListViewAnchor.top:
+        return [
+          ...topSlivers,
+          SliverTwoWayListView.top(
+            controller: controller,
+            itemBuilder: itemBuilder,
+          ),
+          ...aboveCenterSlivers,
+          SliverTwoWayListView.center(
+            controller: controller,
+            centerSliver: centerSliver,
+          ),
+          ...belowCenterSlivers,
+          SliverTwoWayListView.bottom(
+            controller: controller,
+            itemBuilder: itemBuilder,
+          ),
+          ...bottomSlivers,
+        ];
+      case TwoWayListViewAnchor.bottom:
+        throw UnimplementedError();
+    }
+  }
+
+  List<Widget> _buildBottomToTopSlivers(TwoWayListViewAnchor anchor) {
+    switch (anchor) {
+      case TwoWayListViewAnchor.top:
+        throw UnimplementedError();
+      case TwoWayListViewAnchor.bottom:
+        return _buildTopToBottomSlivers(TwoWayListViewAnchor.top);
+    }
   }
 }

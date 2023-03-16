@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:meta/meta.dart';
+import 'package:two_way_scrollable/two_way_scrollable.dart';
 
 Finder findByKey(String key) => find.byKey(Key(key));
 
@@ -137,7 +138,12 @@ void _goldenTestSandboxTwoWayListView(
 }) {
   testWidgets(name, (tester) async {
     await tester.pumpWidget(
-      SandboxApp(reverse: reverse),
+      reverse
+          ? const SandboxApp(
+              anchor: TwoWayListViewAnchor.bottom,
+              direction: TwoWayListViewDirection.bottomToTop,
+            )
+          : const SandboxApp(),
     );
     await body(tester);
     await expectLater(
