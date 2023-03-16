@@ -7,6 +7,7 @@ abstract class SliverTwoWayListView {
     required TwoWayListViewItemBuilder<T> itemBuilder,
   }) =>
       _SliverItemsSection<T>(
+        key: const Key('SliverTwoWayListView.topItemsSection'),
         type: _SliverItemsSectionType.top,
         controller: controller,
         itemBuilder: itemBuilder,
@@ -27,6 +28,7 @@ abstract class SliverTwoWayListView {
     required TwoWayListViewItemBuilder<T> itemBuilder,
   }) =>
       _SliverItemsSection<T>(
+        key: const Key('SliverTwoWayListView.bottomItemsSection'),
         type: _SliverItemsSectionType.bottom,
         controller: controller,
         itemBuilder: itemBuilder,
