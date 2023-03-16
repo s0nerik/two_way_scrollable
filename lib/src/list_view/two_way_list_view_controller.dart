@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
-import 'reversed_list_view.dart';
+import '../util/reversed_list_view.dart';
 
 typedef TwoWayListViewItemBuilder<T> = Widget Function(
   BuildContext context,

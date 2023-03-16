@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import 'two_way_custom_scroll_view.dart';
+import '../two_way_custom_scroll_view.dart';
 import 'two_way_list_view_controller.dart';
 
 class TwoWayListView<T> extends StatefulWidget {
