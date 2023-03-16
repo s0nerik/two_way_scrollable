@@ -84,7 +84,9 @@ class TwoWayListView<T> extends StatelessWidget {
           ...bottomSlivers,
         ];
       case TwoWayListViewAnchor.bottom:
-        throw UnimplementedError();
+        return _buildTopToBottomSlivers(TwoWayListViewAnchor.top)
+            .reversed
+            .toList();
     }
   }
 
