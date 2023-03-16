@@ -124,27 +124,33 @@ class _RenderViewport extends RenderViewport {
         totalForwardScrollExtent += sliverExtent;
       }
     }
-    (offset as ScrollPosition).correctToEnsureViewportIsFilled(
+    final layoutRequired =
+        (offset as ScrollPosition).correctToEnsureViewportIsFilled(
       totalForwardScrollExtent,
       totalBackwardScrollExtent,
     );
-    super.performLayout();
+    if (layoutRequired) {
+      super.performLayout();
+    }
   }
 }
 
 extension _OffsetAdjustment on ScrollPosition {
-  void correctToEnsureViewportIsFilled(
+  /// Returns true if the position was corrected.
+  bool correctToEnsureViewportIsFilled(
     double forwardScrollExtent,
     double backwardScrollExtent,
   ) {
-    if (!hasContentDimensions || !hasViewportDimension || !hasPixels) return;
+    if (!hasContentDimensions || !hasViewportDimension || !hasPixels) {
+      return false;
+    }
 
     final totalScrollExtent = backwardScrollExtent + forwardScrollExtent;
     if (totalScrollExtent < viewportDimension) {
       final target = minScrollExtent;
       final correction = pixels - target;
       correctBy(-correction);
-      return;
+      return true;
     }
     if (backwardScrollExtent < viewportDimension ||
         forwardScrollExtent < viewportDimension) {
@@ -153,7 +159,9 @@ extension _OffsetAdjustment on ScrollPosition {
         final target = adjustedMaxScrollExtent;
         final correction = pixels - target;
         correctBy(-correction);
+        return true;
       }
     }
+    return false;
   }
 }
