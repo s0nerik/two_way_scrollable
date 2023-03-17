@@ -95,23 +95,6 @@ class _ViewportOffset extends DelegatedViewportOffset {
   final ScrollPosition scrollPosition;
   late _RenderViewport viewport;
 
-  double _calculateBackwardScrollableDimensionWithinViewport() {
-    if (viewport.center == null) return 0;
-
-    var totalBackwardScrollable = 0.0;
-
-    var child = viewport.childBefore(viewport.center!);
-    if (child == null) return 0;
-    while (true) {
-      totalBackwardScrollable += child!.geometry?.scrollExtent ?? 0;
-      if (child == viewport.firstChild) break;
-      child = viewport.childBefore(child)!;
-    }
-
-    assert(totalBackwardScrollable < scrollPosition.viewportDimension);
-    return totalBackwardScrollable;
-  }
-
   double _calculateForwardScrollableDimensionWithinViewport() {
     if (viewport.center == null) return 0;
 
@@ -130,17 +113,6 @@ class _ViewportOffset extends DelegatedViewportOffset {
 
   @override
   bool applyContentDimensions(double minScrollExtent, double maxScrollExtent) {
-    late final double backwardScrollableDimension;
-    late final double adjustedMinScrollExtent;
-    if (-minScrollExtent < scrollPosition.viewportDimension) {
-      backwardScrollableDimension =
-          _calculateBackwardScrollableDimensionWithinViewport();
-      adjustedMinScrollExtent = -backwardScrollableDimension;
-    } else {
-      backwardScrollableDimension = -minScrollExtent;
-      adjustedMinScrollExtent = minScrollExtent;
-    }
-
     late final double forwardScrollableDimension;
     late final double adjustedMaxScrollExtent;
     if (maxScrollExtent == 0) {
@@ -155,14 +127,14 @@ class _ViewportOffset extends DelegatedViewportOffset {
     }
 
     final result = scrollPosition.applyContentDimensions(
-      adjustedMinScrollExtent,
-      max(adjustedMinScrollExtent, adjustedMaxScrollExtent),
+      minScrollExtent,
+      max(minScrollExtent, adjustedMaxScrollExtent),
     );
 
     final totalScrollableDimension =
-        backwardScrollableDimension + forwardScrollableDimension;
+        forwardScrollableDimension - minScrollExtent;
     if (totalScrollableDimension < scrollPosition.viewportDimension) {
-      final diff = scrollPosition.pixels - adjustedMinScrollExtent;
+      final diff = scrollPosition.pixels - minScrollExtent;
       if (diff != 0) {
         scrollPosition.correctBy(-diff);
         return false;
