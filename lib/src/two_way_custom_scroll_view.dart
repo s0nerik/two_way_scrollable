@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
@@ -98,10 +100,6 @@ class _RenderViewport extends RenderViewport {
   void performLayout() {
     (offset as _ViewportOffset).viewport = this;
     super.performLayout();
-    while ((offset as _ViewportOffset).needsLayout) {
-      (offset as _ViewportOffset).needsLayout = false;
-      super.performLayout();
-    }
   }
 }
 
@@ -111,17 +109,7 @@ class _ViewportOffset extends DelegatedViewportOffset {
   final ScrollPosition scrollPosition;
   late _RenderViewport viewport;
 
-  bool needsLayout = false;
-
-  @override
-  bool applyContentDimensions(double minScrollExtent, double maxScrollExtent) {
-    if (maxScrollExtent > 0) {
-      return scrollPosition.applyContentDimensions(
-        minScrollExtent,
-        maxScrollExtent,
-      );
-    }
-
+  double _calculateForwardScrollExtent() {
     // `childrenInPaintOrder` iteration order example (based on TwoWayListView):
     //
     // --------- backward ----------
@@ -152,24 +140,36 @@ class _ViewportOffset extends DelegatedViewportOffset {
         totalForwardScrollExtent += sliverExtent;
       }
     }
-    assert(totalForwardScrollExtent < scrollPosition.viewportDimension);
+    return totalForwardScrollExtent;
+  }
 
-    final totalScrollExtent =
-        totalBackwardScrollExtent + totalForwardScrollExtent;
+  @override
+  bool applyContentDimensions(double minScrollExtent, double maxScrollExtent) {
+    if (maxScrollExtent == 0) {
+      final forwardScrollableHeight = _calculateForwardScrollExtent();
 
-    if (totalScrollExtent < scrollPosition.viewportDimension) {
-      final diff = scrollPosition.pixels + totalBackwardScrollExtent;
-      if (diff != 0) {
-        scrollPosition.correctBy(-diff);
-        needsLayout = true;
+      final adjustedMaxScrollExtent =
+          forwardScrollableHeight - scrollPosition.viewportDimension;
+      final result = scrollPosition.applyContentDimensions(
+        minScrollExtent,
+        max(minScrollExtent, adjustedMaxScrollExtent),
+      );
+
+      final backwardScrollableHeight = -minScrollExtent;
+      final totalScrollableHeight =
+          backwardScrollableHeight + forwardScrollableHeight;
+      if (totalScrollableHeight < scrollPosition.viewportDimension) {
+        final diff = scrollPosition.pixels - minScrollExtent;
+        if (diff != 0) {
+          scrollPosition.correctBy(-diff);
+          return false;
+        }
       }
-      return true;
+      return result;
     }
-
     return scrollPosition.applyContentDimensions(
       minScrollExtent,
-      maxScrollExtent -
-          (scrollPosition.viewportDimension - totalForwardScrollExtent),
+      maxScrollExtent,
     );
   }
 }
