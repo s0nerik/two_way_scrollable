@@ -118,8 +118,10 @@ class _ViewportOffset extends DelegatedViewportOffset {
     if (maxScrollExtent == 0) {
       forwardScrollableDimension =
           _calculateForwardScrollableDimensionWithinViewport();
-      adjustedMaxScrollExtent =
-          forwardScrollableDimension - scrollPosition.viewportDimension;
+      adjustedMaxScrollExtent = max(
+        minScrollExtent,
+        forwardScrollableDimension - scrollPosition.viewportDimension,
+      );
     } else {
       forwardScrollableDimension =
           maxScrollExtent + scrollPosition.viewportDimension;
@@ -128,7 +130,7 @@ class _ViewportOffset extends DelegatedViewportOffset {
 
     final result = scrollPosition.applyContentDimensions(
       minScrollExtent,
-      max(minScrollExtent, adjustedMaxScrollExtent),
+      adjustedMaxScrollExtent,
     );
 
     final totalScrollableDimension =
