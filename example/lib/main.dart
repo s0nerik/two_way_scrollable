@@ -8,11 +8,14 @@ import 'package:random_color/random_color.dart';
 import 'package:two_way_scrollable/two_way_scrollable.dart';
 import 'package:window_size/window_size.dart';
 
+const _macosTitlebarHeight = 22.0;
+const _windowSize = Size(300, 600 + _macosTitlebarHeight);
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-  setWindowMinSize(const Size(300, 600));
-  setWindowMaxSize(const Size(300, 600));
+  setWindowMinSize(_windowSize);
+  setWindowMaxSize(_windowSize);
   runApp(const SandboxApp());
 }
 
@@ -78,7 +81,19 @@ class _ContentState extends State<_Content> {
     return AppBar(
       centerTitle: false,
       actions: [
-        const Icon(MdiIcons.plusBox),
+        GestureDetector(
+          onTap: () {
+            for (var i = 0; i < 2; i++) {
+              final last = ctrl.items.lastOrNull;
+              ctrl.insert(ctrl.items.length, last != null ? last + 1 : 0);
+            }
+            for (var i = 0; i < 1; i++) {
+              final first = ctrl.items.firstOrNull;
+              ctrl.insert(-1, first != null ? first - 1 : -1);
+            }
+          },
+          child: const Icon(MdiIcons.plusBox),
+        ),
         InkResponse(
           key: const ValueKey('add-first'),
           onTap: () {
