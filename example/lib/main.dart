@@ -6,9 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:random_color/random_color.dart';
 import 'package:two_way_scrollable/two_way_scrollable.dart';
+import 'package:window_size/window_size.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+  setWindowMinSize(const Size(300, 600));
+  setWindowMaxSize(const Size(300, 600));
   runApp(const SandboxApp());
 }
 

@@ -15,6 +15,11 @@ dependencies:
   random_color: ^1.0.6-nullsafety
   collection: ^1.17.0
   material_design_icons_flutter: ^6.0.7096
+  window_size:
+    git:
+      url: git@github.com:google/flutter-desktop-embedding.git
+      path: plugins/window_size
+      ref: 6c66ad23ee79749f30a8eece542cf54eaf157ed8
 
 dev_dependencies:
   flutter_test:
