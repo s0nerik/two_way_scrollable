@@ -58,6 +58,8 @@ class _SliverItemsSection<T> extends StatefulWidget {
 class SliverItemsSectionState<T> extends State<_SliverItemsSection<T>> {
   SliverItemsSectionState._();
 
+  late final initialItemCount = items.length;
+
   List<T> get items {
     switch (widget.type) {
       case _SliverItemsSectionType.top:
@@ -104,6 +106,7 @@ class SliverItemsSectionState<T> extends State<_SliverItemsSection<T>> {
       key: widget.type == _SliverItemsSectionType.top
           ? widget.controller.topItemsAnimatedListSliverKey
           : widget.controller.bottomItemsAnimatedListSliverKey,
+      initialItemCount: initialItemCount,
       findChildIndexCallback: _findChildIndexCallback,
       itemBuilder: _itemBuilder,
     );
