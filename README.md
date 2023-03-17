@@ -5,7 +5,7 @@
 [![two_way_scrollable](https://img.shields.io/pub/points/two_way_scrollable)](https://pub.dev/packages/two_way_scrollable)
 [![two_way_scrollable](https://img.shields.io/pub/popularity/two_way_scrollable)](https://pub.dev/packages/two_way_scrollable)
 
-A set of two-way growable widgets for Flutter that properly fill the viewport.
+A set of two-way growable widgets for Flutter that properly fill the viewport even if there is not enough content.
 
 ## Example
 
@@ -13,11 +13,11 @@ A set of two-way growable widgets for Flutter that properly fill the viewport.
 
 ## Features
 
-- `TwoWayListView` - an `AnimatedListView` analog that properly grows in both directions.
-- `TwoWayCustomScrollView` - a `CustomScrollView` analog that properly grows in both directions.
+- `TwoWayCustomScrollView` - a `CustomScrollView` replacement that properly grows in both directions.
+- `SliverTwoWayListView` - a set of `Sliver` widgets that can be used with `TwoWayCustomScrollView`/`CustomScrollView` to achieve any positioning in a list.
+- `TwoWayListView` - an `AnimatedListView` analog that properly grows in both directions. Based on `TwoWayCustomScrollView` and `SliverTwoWayListView`.
 
-Note: these widgets don't provide a way to customize `anchor` parameter value, hardcoding it to be 0. If you need a
-bottom-to-top list, use `reverse: true` and provide list items in reverse order.
+Note: `TwoWayCustomScrollView` and `TwoWayListView` only allow anchoring to the top or bottom, but not in the middle.
 
 ## Getting started
 
@@ -27,4 +27,4 @@ flutter pub add two_way_scrollable
 
 ## Usage
 
-https://github.com/s0nerik/two_way_scrollable/blob/e8f3ac4c14d438535896cfee606cfcee7ee2d6da/example/lib/main.dart#L151
+https://github.com/s0nerik/two_way_scrollable/blob/07f2dcdcd31c0f3d0dc4ff35fb15ebf35d389801/example/lib/main.dart#L148
