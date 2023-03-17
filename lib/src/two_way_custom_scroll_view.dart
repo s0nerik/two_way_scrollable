@@ -1,6 +1,8 @@
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
+import 'util/delegated_viewport_offset.dart';
+
 class TwoWayCustomScrollView extends CustomScrollView {
   const TwoWayCustomScrollView({
     super.key,
@@ -33,7 +35,7 @@ class TwoWayCustomScrollView extends CustomScrollView {
   ) {
     return _Viewport(
       axisDirection: axisDirection,
-      offset: offset,
+      offset: _ViewportOffset(offset as ScrollPosition),
       slivers: slivers,
       cacheExtent: cacheExtent,
       center: center,
@@ -88,13 +90,36 @@ class _RenderViewport extends RenderViewport {
     super.cacheExtent,
     super.cacheExtentStyle,
     super.clipBehavior,
-  });
+  }) {
+    (offset as _ViewportOffset).viewport = this;
+  }
 
   @override
   void performLayout() {
+    (offset as _ViewportOffset).viewport = this;
     super.performLayout();
-    if ((offset as ScrollPosition).maxScrollExtent > 0) {
-      return;
+    while ((offset as _ViewportOffset).needsLayout) {
+      (offset as _ViewportOffset).needsLayout = false;
+      super.performLayout();
+    }
+  }
+}
+
+class _ViewportOffset extends DelegatedViewportOffset {
+  _ViewportOffset(this.scrollPosition) : super(scrollPosition);
+
+  final ScrollPosition scrollPosition;
+  late _RenderViewport viewport;
+
+  bool needsLayout = false;
+
+  @override
+  bool applyContentDimensions(double minScrollExtent, double maxScrollExtent) {
+    if (maxScrollExtent > 0) {
+      return scrollPosition.applyContentDimensions(
+        minScrollExtent,
+        maxScrollExtent,
+      );
     }
 
     // `childrenInPaintOrder` iteration order example (based on TwoWayListView):
@@ -111,7 +136,7 @@ class _RenderViewport extends RenderViewport {
     // 7: bottom
     // 8: bottomSliver
     // 9: centerSliver
-    final iter = childrenInPaintOrder.iterator;
+    final iter = viewport.childrenInPaintOrder.iterator;
     double totalForwardScrollExtent = 0;
     double totalBackwardScrollExtent = 0;
     var isBackward = true;
@@ -127,44 +152,24 @@ class _RenderViewport extends RenderViewport {
         totalForwardScrollExtent += sliverExtent;
       }
     }
-    final layoutRequired =
-        (offset as ScrollPosition).correctToEnsureViewportIsFilled(
-      totalForwardScrollExtent,
-      totalBackwardScrollExtent,
-    );
-    if (layoutRequired) {
-      super.performLayout();
-    }
-  }
-}
+    assert(totalForwardScrollExtent < scrollPosition.viewportDimension);
 
-extension _OffsetAdjustment on ScrollPosition {
-  /// Returns true if the position was corrected.
-  bool correctToEnsureViewportIsFilled(
-    double forwardScrollExtent,
-    double backwardScrollExtent,
-  ) {
-    if (!hasContentDimensions || !hasViewportDimension || !hasPixels) {
-      return false;
-    }
+    final totalScrollExtent =
+        totalBackwardScrollExtent + totalForwardScrollExtent;
 
-    final totalScrollExtent = backwardScrollExtent + forwardScrollExtent;
-    if (totalScrollExtent < viewportDimension) {
-      final target = minScrollExtent;
-      final correction = pixels - target;
-      correctBy(-correction);
+    if (totalScrollExtent < scrollPosition.viewportDimension) {
+      final diff = scrollPosition.pixels + totalBackwardScrollExtent;
+      if (diff != 0) {
+        scrollPosition.correctBy(-diff);
+        needsLayout = true;
+      }
       return true;
     }
-    if (backwardScrollExtent < viewportDimension ||
-        forwardScrollExtent < viewportDimension) {
-      final adjustedMaxScrollExtent = forwardScrollExtent - viewportDimension;
-      if (pixels > adjustedMaxScrollExtent) {
-        final target = adjustedMaxScrollExtent;
-        final correction = pixels - target;
-        correctBy(-correction);
-        return true;
-      }
-    }
-    return false;
+
+    return scrollPosition.applyContentDimensions(
+      minScrollExtent,
+      maxScrollExtent -
+          (scrollPosition.viewportDimension - totalForwardScrollExtent),
+    );
   }
 }
