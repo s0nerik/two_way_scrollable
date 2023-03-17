@@ -2,10 +2,10 @@ import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 import 'package:two_way_scrollable/src/list_view/two_way_list_view_controller.dart';
 
-abstract class SliverTwoWayListView {
+abstract class SliverTwoWayList {
   static Widget top<T>({
-    required TwoWayListViewController<T> controller,
-    required TwoWayListViewItemBuilder<T> itemBuilder,
+    required TwoWayListController<T> controller,
+    required TwoWayListItemBuilder<T> itemBuilder,
   }) =>
       _SliverItemsSection<T>(
         key: controller.topItemsSliverKey,
@@ -15,7 +15,7 @@ abstract class SliverTwoWayListView {
       );
 
   static Widget center<T>({
-    required TwoWayListViewController<T> controller,
+    required TwoWayListController<T> controller,
     required Widget? centerSliver,
   }) =>
       KeyedSubtree(
@@ -25,8 +25,8 @@ abstract class SliverTwoWayListView {
       );
 
   static Widget bottom<T>({
-    required TwoWayListViewController<T> controller,
-    required TwoWayListViewItemBuilder<T> itemBuilder,
+    required TwoWayListController<T> controller,
+    required TwoWayListItemBuilder<T> itemBuilder,
   }) =>
       _SliverItemsSection<T>(
         key: controller.bottomItemsSliverKey,
@@ -47,8 +47,8 @@ class _SliverItemsSection<T> extends StatefulWidget {
   }) : super(key: key);
 
   final _SliverItemsSectionType type;
-  final TwoWayListViewController<T> controller;
-  final TwoWayListViewItemBuilder<T> itemBuilder;
+  final TwoWayListController<T> controller;
+  final TwoWayListItemBuilder<T> itemBuilder;
 
   @override
   State<_SliverItemsSection<T>> createState() => SliverItemsSectionState<T>._();

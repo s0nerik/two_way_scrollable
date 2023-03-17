@@ -56,7 +56,7 @@ class _Content extends StatefulWidget {
 }
 
 class _ContentState extends State<_Content> {
-  var ctrl = TwoWayListViewController<int>();
+  var ctrl = TwoWayListController<int>();
 
   late var anchor = widget.anchor;
   late var direction = widget.direction;
@@ -175,7 +175,7 @@ class _ContentState extends State<_Content> {
         InkResponse(
           key: const ValueKey('refresh'),
           onTap: () => setState(() {
-            ctrl = TwoWayListViewController<int>();
+            ctrl = TwoWayListController<int>();
             direction = TwoWayListViewDirection.topToBottom;
             anchor = TwoWayListViewAnchor.top;
           }),
@@ -278,7 +278,7 @@ class _Item extends StatefulWidget {
     required this.animation,
   }) : super(key: key);
 
-  final TwoWayListViewController<int> ctrl;
+  final TwoWayListController<int> ctrl;
   final int item;
   final Animation<double> animation;
 

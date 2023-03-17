@@ -22,8 +22,8 @@ class TwoWayListView<T> extends StatelessWidget {
     this.bottomSlivers = const [],
   }) : super(key: key);
 
-  final TwoWayListViewController<T> controller;
-  final TwoWayListViewItemBuilder<T> itemBuilder;
+  final TwoWayListController<T> controller;
+  final TwoWayListItemBuilder<T> itemBuilder;
   final TwoWayListViewAnchor anchor;
   final TwoWayListViewDirection direction;
 
@@ -67,17 +67,17 @@ class TwoWayListView<T> extends StatelessWidget {
       case TwoWayListViewAnchor.top:
         return [
           ...topSlivers,
-          SliverTwoWayListView.top(
+          SliverTwoWayList.top(
             controller: controller,
             itemBuilder: itemBuilder,
           ),
           ...aboveCenterSlivers,
-          SliverTwoWayListView.center(
+          SliverTwoWayList.center(
             controller: controller,
             centerSliver: centerSliver,
           ),
           ...belowCenterSlivers,
-          SliverTwoWayListView.bottom(
+          SliverTwoWayList.bottom(
             controller: controller,
             itemBuilder: itemBuilder,
           ),

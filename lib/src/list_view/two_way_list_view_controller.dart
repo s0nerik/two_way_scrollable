@@ -5,7 +5,7 @@ import 'package:two_way_scrollable/src/list_view/sliver_two_way_list_view.dart';
 
 import '../util/reversed_list_view.dart';
 
-typedef TwoWayListViewItemBuilder<T> = Widget Function(
+typedef TwoWayListItemBuilder<T> = Widget Function(
   BuildContext context,
   int index,
   T item,
@@ -13,7 +13,7 @@ typedef TwoWayListViewItemBuilder<T> = Widget Function(
 );
 
 @internal
-typedef RemovedItemBuilder<T> = Widget Function(
+typedef TwoWayListRemovedItemBuilder<T> = Widget Function(
   BuildContext context,
   Key key,
   int index,
@@ -21,8 +21,8 @@ typedef RemovedItemBuilder<T> = Widget Function(
   Animation<double> anim,
 );
 
-class TwoWayListViewController<T> with ChangeNotifier {
-  TwoWayListViewController({
+class TwoWayListController<T> with ChangeNotifier {
+  TwoWayListController({
     this.itemInsertDuration = const Duration(milliseconds: 500),
     this.itemRemoveDuration = const Duration(milliseconds: 500),
   });
@@ -32,27 +32,27 @@ class TwoWayListViewController<T> with ChangeNotifier {
 
   @internal
   final topItemsSliverKey = GlobalKey<SliverItemsSectionState<T>>(
-    debugLabel: 'TwoWayListView.topItemsSliver',
+    debugLabel: 'TwoWayList.topItemsSliver',
   );
 
   @internal
   final topItemsAnimatedListSliverKey = GlobalKey<SliverAnimatedListState>(
-    debugLabel: 'TwoWayListView.topItemsAnimatedListSliver',
+    debugLabel: 'TwoWayList.topItemsAnimatedListSliver',
   );
 
   @internal
   final centerSliverKey = GlobalKey(
-    debugLabel: 'TwoWayListView.centerSliver',
+    debugLabel: 'TwoWayList.centerSliver',
   );
 
   @internal
   final bottomItemsSliverKey = GlobalKey<SliverItemsSectionState<T>>(
-    debugLabel: 'TwoWayListView.bottomItemsSliver',
+    debugLabel: 'TwoWayList.bottomItemsSliver',
   );
 
   @internal
   final bottomItemsAnimatedListSliverKey = GlobalKey<SliverAnimatedListState>(
-    debugLabel: 'TwoWayListView.bottomItemsAnimatedListSliver',
+    debugLabel: 'TwoWayList.bottomItemsAnimatedListSliver',
   );
 
   var _center = 0;
@@ -114,7 +114,7 @@ class TwoWayListViewController<T> with ChangeNotifier {
         '''
           Tried to insert items into the top sliver, but the top sliver is not
           attached to the tree. Did you forget to include the
-          `SliverTwoWayListView.top` within `CustomScrollView.slivers`?
+          `SliverTwoWayList.top` within `CustomScrollView.slivers`?
         ''',
       );
       _center += items.length;
@@ -136,7 +136,7 @@ class TwoWayListViewController<T> with ChangeNotifier {
         '''
           Tried to insert items into the bottom sliver, but the bottom sliver is
           not attached to the tree. Did you forget to include the
-          `SliverTwoWayListView.bottom` within `CustomScrollView.slivers`?
+          `SliverTwoWayList.bottom` within `CustomScrollView.slivers`?
         ''',
       );
       var i = 0;
@@ -166,7 +166,7 @@ class TwoWayListViewController<T> with ChangeNotifier {
 
     late final GlobalKey<SliverAnimatedListState> sliverKey;
     late final int sectionIndex;
-    late final RemovedItemBuilder<T> removedItemBuilder;
+    late final TwoWayListRemovedItemBuilder<T> removedItemBuilder;
     if (itemIndex < _center) {
       assert(
         topItemsAnimatedListSliverKey.currentState != null &&
@@ -174,7 +174,7 @@ class TwoWayListViewController<T> with ChangeNotifier {
         '''
           Tried to remove items from the top sliver, but the top sliver is not
           attached to the tree. Did you forget to include the
-          `SliverTwoWayListView.top` within `CustomScrollView.slivers`?
+          `SliverTwoWayList.top` within `CustomScrollView.slivers`?
         ''',
       );
       sectionIndex = _topIndex(itemIndex);
@@ -188,7 +188,7 @@ class TwoWayListViewController<T> with ChangeNotifier {
         '''
           Tried to remove items from the bottom sliver, but the bottom sliver is
           not attached to the tree. Did you forget to include the
-          `SliverTwoWayListView.bottom` within `CustomScrollView.slivers`?
+          `SliverTwoWayList.bottom` within `CustomScrollView.slivers`?
         ''',
       );
       sectionIndex = _bottomIndex(itemIndex);

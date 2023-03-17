@@ -14,8 +14,8 @@ A set of two-way growable widgets for Flutter that properly fill the viewport ev
 ## Features
 
 - `TwoWayCustomScrollView` - a `CustomScrollView` replacement that properly grows in both directions.
-- `SliverTwoWayListView` - a set of `Sliver` widgets that can be used with `TwoWayCustomScrollView`/`CustomScrollView` to achieve any positioning in a list.
-- `TwoWayListView` - an `AnimatedListView` analog that properly grows in both directions. Based on `TwoWayCustomScrollView` and `SliverTwoWayListView`.
+- `SliverTwoWayList` - a set of `Sliver` widgets that can be used with `TwoWayCustomScrollView`/`CustomScrollView` to achieve any positioning in a list.
+- `TwoWayListView` - an `AnimatedListView` analog that properly grows in both directions. Based on `TwoWayCustomScrollView` and `SliverTwoWayList`.
 
 Note: `TwoWayCustomScrollView` and `TwoWayListView` only allow anchoring to the top or bottom, but not in the middle.
 
