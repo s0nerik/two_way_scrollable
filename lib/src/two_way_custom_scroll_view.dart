@@ -96,15 +96,15 @@ class _ViewportOffset extends DelegatedViewportOffset {
   late _RenderViewport viewport;
 
   double _calculateForwardScrollableDimensionWithinViewport() {
-    if (viewport.lastChild == null) return 0;
+    if (viewport.center == null) return 0;
 
     var totalForwardScrollable = 0.0;
 
-    var child = viewport.lastChild!;
+    var child = viewport.center!;
     while (true) {
       totalForwardScrollable += child.geometry?.scrollExtent ?? 0;
-      if (child == viewport.center) break;
-      child = viewport.childBefore(child)!;
+      if (child == viewport.lastChild) break;
+      child = viewport.childAfter(child)!;
     }
 
     assert(totalForwardScrollable < scrollPosition.viewportDimension);
