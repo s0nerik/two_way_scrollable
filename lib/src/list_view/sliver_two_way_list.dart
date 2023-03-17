@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
-import 'package:two_way_scrollable/src/list_view/two_way_list_view_controller.dart';
+import 'package:two_way_scrollable/src/list_view/two_way_list_controller.dart';
 
 abstract class SliverTwoWayList {
   static Widget top<T>({

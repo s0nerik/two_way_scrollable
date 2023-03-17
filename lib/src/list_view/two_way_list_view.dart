@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
-import 'package:two_way_scrollable/src/list_view/sliver_two_way_list_view.dart';
+import 'package:two_way_scrollable/src/list_view/sliver_two_way_list.dart';
 
 import '../two_way_custom_scroll_view.dart';
-import 'two_way_list_view_controller.dart';
+import 'two_way_list_controller.dart';
 
 enum TwoWayListViewAnchor { top, bottom }
 

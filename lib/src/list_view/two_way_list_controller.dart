@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
-import 'package:two_way_scrollable/src/list_view/sliver_two_way_list_view.dart';
+import 'package:two_way_scrollable/src/list_view/sliver_two_way_list.dart';
 
 import '../util/reversed_list_view.dart';
 
