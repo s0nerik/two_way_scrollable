@@ -81,19 +81,7 @@ class _ContentState extends State<_Content> {
     return AppBar(
       centerTitle: false,
       actions: [
-        GestureDetector(
-          onTap: () {
-            for (var i = 0; i < 2; i++) {
-              final last = ctrl.items.lastOrNull;
-              ctrl.insert(ctrl.items.length, last != null ? last + 1 : 0);
-            }
-            for (var i = 0; i < 1; i++) {
-              final first = ctrl.items.firstOrNull;
-              ctrl.insert(-1, first != null ? first - 1 : -1);
-            }
-          },
-          child: const Icon(MdiIcons.plusBox),
-        ),
+        const Icon(MdiIcons.plusBox),
         InkResponse(
           key: const ValueKey('add-first'),
           onTap: () {
