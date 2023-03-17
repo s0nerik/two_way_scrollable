@@ -100,9 +100,10 @@ class _ViewportOffset extends DelegatedViewportOffset {
 
     var totalBackwardScrollable = 0.0;
 
-    var child = viewport.center!;
+    var child = viewport.childBefore(viewport.center!);
+    if (child == null) return 0;
     while (true) {
-      totalBackwardScrollable += child.geometry?.scrollExtent ?? 0;
+      totalBackwardScrollable += child!.geometry?.scrollExtent ?? 0;
       if (child == viewport.firstChild) break;
       child = viewport.childBefore(child)!;
     }
@@ -129,32 +130,44 @@ class _ViewportOffset extends DelegatedViewportOffset {
 
   @override
   bool applyContentDimensions(double minScrollExtent, double maxScrollExtent) {
-    if (maxScrollExtent == 0) {
-      final forwardScrollableDimension =
-          _calculateForwardScrollableDimensionWithinViewport();
-
-      final adjustedMaxScrollExtent =
-          forwardScrollableDimension - scrollPosition.viewportDimension;
-      final result = scrollPosition.applyContentDimensions(
-        minScrollExtent,
-        max(minScrollExtent, adjustedMaxScrollExtent),
-      );
-
-      final backwardScrollableHeight = -minScrollExtent;
-      final totalScrollableHeight =
-          backwardScrollableHeight + forwardScrollableDimension;
-      if (totalScrollableHeight < scrollPosition.viewportDimension) {
-        final diff = scrollPosition.pixels - minScrollExtent;
-        if (diff != 0) {
-          scrollPosition.correctBy(-diff);
-          return false;
-        }
-      }
-      return result;
+    late final double backwardScrollableDimension;
+    late final double adjustedMinScrollExtent;
+    if (-minScrollExtent < scrollPosition.viewportDimension) {
+      backwardScrollableDimension =
+          _calculateBackwardScrollableDimensionWithinViewport();
+      adjustedMinScrollExtent = -backwardScrollableDimension;
+    } else {
+      backwardScrollableDimension = -minScrollExtent;
+      adjustedMinScrollExtent = minScrollExtent;
     }
-    return scrollPosition.applyContentDimensions(
-      minScrollExtent,
-      maxScrollExtent,
+
+    late final double forwardScrollableDimension;
+    late final double adjustedMaxScrollExtent;
+    if (maxScrollExtent == 0) {
+      forwardScrollableDimension =
+          _calculateForwardScrollableDimensionWithinViewport();
+      adjustedMaxScrollExtent =
+          forwardScrollableDimension - scrollPosition.viewportDimension;
+    } else {
+      forwardScrollableDimension =
+          maxScrollExtent + scrollPosition.viewportDimension;
+      adjustedMaxScrollExtent = maxScrollExtent;
+    }
+
+    final result = scrollPosition.applyContentDimensions(
+      adjustedMinScrollExtent,
+      max(adjustedMinScrollExtent, adjustedMaxScrollExtent),
     );
+
+    final totalScrollableDimension =
+        backwardScrollableDimension + forwardScrollableDimension;
+    if (totalScrollableDimension < scrollPosition.viewportDimension) {
+      final diff = scrollPosition.pixels - adjustedMinScrollExtent;
+      if (diff != 0) {
+        scrollPosition.correctBy(-diff);
+        return false;
+      }
+    }
+    return result;
   }
 }
