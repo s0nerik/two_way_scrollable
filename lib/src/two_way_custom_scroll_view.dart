@@ -93,6 +93,9 @@ class _RenderViewport extends RenderViewport {
   @override
   void performLayout() {
     super.performLayout();
+    if ((offset as ScrollPosition).maxScrollExtent > 0) {
+      return;
+    }
 
     // `childrenInPaintOrder` iteration order example (based on TwoWayListView):
     //
