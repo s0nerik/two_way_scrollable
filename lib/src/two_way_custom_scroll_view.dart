@@ -124,7 +124,7 @@ class _ViewportOffset extends DelegatedViewportOffset {
       child = viewport.childAfter(child)!;
     }
 
-    assert(totalForwardScrollable < scrollPosition.viewportDimension);
+    assert(totalForwardScrollable <= scrollPosition.viewportDimension);
     return totalForwardScrollable;
   }
 
