@@ -17,16 +17,13 @@ class TwoWayCustomScrollView extends CustomScrollView {
     super.shrinkWrap,
     required Key super.center,
     super.cacheExtent,
-    List<Widget> slivers = const <Widget>[],
+    super.slivers,
     super.semanticChildCount,
     super.dragStartBehavior,
     super.keyboardDismissBehavior,
     super.restorationId,
     super.clipBehavior,
-  }) : super(
-          anchor: 0,
-          slivers: slivers + const [_SliverBottomBoundary()],
-        );
+  }) : super(anchor: 0);
 
   @override
   Widget buildViewport(
@@ -45,17 +42,6 @@ class TwoWayCustomScrollView extends CustomScrollView {
     );
   }
 }
-
-class _SliverBottomBoundary extends SliverToBoxAdapter {
-  const _SliverBottomBoundary({Key? key})
-      : super(key: key, child: const SizedBox.shrink());
-
-  @override
-  _RenderSliverBottomBoundary createRenderObject(BuildContext context) =>
-      _RenderSliverBottomBoundary();
-}
-
-class _RenderSliverBottomBoundary extends RenderSliverToBoxAdapter {}
 
 class _Viewport extends Viewport {
   _Viewport({
@@ -109,47 +95,30 @@ class _ViewportOffset extends DelegatedViewportOffset {
   final ScrollPosition scrollPosition;
   late _RenderViewport viewport;
 
-  double _calculateForwardScrollExtent() {
-    // `childrenInPaintOrder` iteration order example (based on TwoWayListView):
-    //
-    // --------- backward ----------
-    // 0: debugTopListBoundary
-    // 1: topPadding
-    // 2: top
-    // 3: topSliver
-    // --------- forward ----------
-    // 4: _SliverBottomBoundary
-    // 5: debugBottomListBoundary
-    // 6: bottomPadding
-    // 7: bottom
-    // 8: bottomSliver
-    // 9: centerSliver
-    final iter = viewport.childrenInPaintOrder.iterator;
-    double totalForwardScrollExtent = 0;
-    double totalBackwardScrollExtent = 0;
-    var isBackward = true;
-    while (iter.moveNext()) {
-      final renderObject = iter.current;
-      if (isBackward && renderObject is _RenderSliverBottomBoundary) {
-        isBackward = false;
-      }
-      final sliverExtent = renderObject.geometry?.scrollExtent ?? 0;
-      if (isBackward) {
-        totalBackwardScrollExtent += sliverExtent;
-      } else {
-        totalForwardScrollExtent += sliverExtent;
-      }
+  double _calculateForwardScrollableDimensionWithinViewport() {
+    if (viewport.lastChild == null) return 0;
+
+    var totalForwardScrollable = 0.0;
+
+    var child = viewport.lastChild!;
+    while (true) {
+      totalForwardScrollable += child.geometry?.scrollExtent ?? 0;
+      if (child == viewport.center) break;
+      child = viewport.childBefore(child)!;
     }
-    return totalForwardScrollExtent;
+
+    assert(totalForwardScrollable < scrollPosition.viewportDimension);
+    return totalForwardScrollable;
   }
 
   @override
   bool applyContentDimensions(double minScrollExtent, double maxScrollExtent) {
     if (maxScrollExtent == 0) {
-      final forwardScrollableHeight = _calculateForwardScrollExtent();
+      final forwardScrollableDimension =
+          _calculateForwardScrollableDimensionWithinViewport();
 
       final adjustedMaxScrollExtent =
-          forwardScrollableHeight - scrollPosition.viewportDimension;
+          forwardScrollableDimension - scrollPosition.viewportDimension;
       final result = scrollPosition.applyContentDimensions(
         minScrollExtent,
         max(minScrollExtent, adjustedMaxScrollExtent),
@@ -157,7 +126,7 @@ class _ViewportOffset extends DelegatedViewportOffset {
 
       final backwardScrollableHeight = -minScrollExtent;
       final totalScrollableHeight =
-          backwardScrollableHeight + forwardScrollableHeight;
+          backwardScrollableHeight + forwardScrollableDimension;
       if (totalScrollableHeight < scrollPosition.viewportDimension) {
         final diff = scrollPosition.pixels - minScrollExtent;
         if (diff != 0) {
