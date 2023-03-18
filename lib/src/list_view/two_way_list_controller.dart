@@ -103,6 +103,8 @@ class TwoWayListController<T> with ChangeNotifier {
   /// If [index] is smaller than [centerIndex], the item is guaranteed to be
   /// added to the top sliver.
   void insertAll(int index, Iterable<T> items, {Duration? duration}) {
+    if (items.isEmpty) return;
+
     final adjustedIndex = index < 0 ? 0 : index;
 
     _items.insertAll(adjustedIndex, items);
