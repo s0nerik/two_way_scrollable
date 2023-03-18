@@ -1,3 +1,13 @@
+## 2.0.0
+
+#### Breaking changes
+- `SliverTwoWayListView` -> `SliverTwoWayList`
+- `TwoWayListViewController` -> `TwoWayListController`
+
+#### Other changes
+- Automatic `initalItemCount` handling for `SliverTwoWayList`.
+- Added early-return to `TwoWayListController.insertAll` in case of adding an empty items list.
+
 ## 1.0.0
 
 - `TwoWayCustomScrollView`:
