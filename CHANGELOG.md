@@ -1,3 +1,8 @@
+## 2.1.0
+
+- Fixed `index` parameter value in `itemBuilder`
+- Added ability to provide a list of durations to `TwoWayListController.insertAll`
+
 ## 2.0.0
 
 #### Breaking changes
