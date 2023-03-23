@@ -82,9 +82,14 @@ class SliverItemsSectionState<T> extends State<_SliverItemsSection<T>> {
   ) {
     final item = items[index];
     final key = widget.controller.itemKeys[item]!;
+
+    final actualIndex = widget.type == _SliverItemsSectionType.bottom
+        ? widget.controller.centerIndex + index
+        : widget.controller.centerIndex - index - 1;
+
     return KeyedSubtree(
       key: key,
-      child: widget.itemBuilder(context, index, item, animation),
+      child: widget.itemBuilder(context, actualIndex, item, animation),
     );
   }
 
