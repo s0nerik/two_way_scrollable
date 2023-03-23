@@ -102,8 +102,30 @@ class TwoWayListController<T> with ChangeNotifier {
   ///
   /// If [index] is smaller than [centerIndex], the item is guaranteed to be
   /// added to the top sliver.
-  void insertAll(int index, Iterable<T> items, {Duration? duration}) {
+  void insertAll(
+    int index,
+    Iterable<T> items, {
+    Duration? duration,
+    List<Duration>? durations,
+  }) {
+    assert(
+      duration == null || durations == null,
+      'Only one of `duration` and `durations` can be specified.',
+    );
+    assert(
+      durations == null || durations.length == items.length,
+      '''
+        The length of `durations` must be equal to the length of `items`.
+        Expected ${items.length} durations, but got ${durations.length}.
+      ''',
+    );
     if (items.isEmpty) return;
+
+    Duration getDuration(int index) {
+      if (durations != null) return durations[index];
+      if (duration != null) return duration;
+      return itemInsertDuration;
+    }
 
     final adjustedIndex = index < 0 ? 0 : index;
 
@@ -127,7 +149,7 @@ class TwoWayListController<T> with ChangeNotifier {
         _assignKey(item);
         topItemsAnimatedListSliverKey.currentState!.insertItem(
           _topIndex(adjustedIndex + i),
-          duration: duration ?? itemInsertDuration,
+          duration: getDuration(i),
         );
         i--;
       }
@@ -146,7 +168,7 @@ class TwoWayListController<T> with ChangeNotifier {
         _assignKey(item);
         bottomItemsAnimatedListSliverKey.currentState!.insertItem(
           _bottomIndex(adjustedIndex + i),
-          duration: duration ?? itemInsertDuration,
+          duration: getDuration(i),
         );
         i++;
       }
