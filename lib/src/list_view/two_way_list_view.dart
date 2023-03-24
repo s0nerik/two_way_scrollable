@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:two_way_scrollable/src/list_view/sliver_two_way_list.dart';
 
@@ -20,6 +21,15 @@ class TwoWayListView<T> extends StatelessWidget {
     this.centerSliver,
     this.belowCenterSlivers = const [],
     this.bottomSlivers = const [],
+    this.scrollController,
+    this.primary,
+    this.physics,
+    this.scrollBehavior,
+    this.cacheExtent,
+    this.dragStartBehavior = DragStartBehavior.start,
+    this.keyboardDismissBehavior = ScrollViewKeyboardDismissBehavior.manual,
+    this.restorationId,
+    this.clipBehavior = Clip.hardEdge,
   }) : super(key: key);
 
   final TwoWayListController<T> controller;
@@ -44,12 +54,31 @@ class TwoWayListView<T> extends StatelessWidget {
   /// Slivers placed conceptually below items.
   final List<Widget> bottomSlivers;
 
+  final ScrollController? scrollController;
+  final bool? primary;
+  final ScrollPhysics? physics;
+  final ScrollBehavior? scrollBehavior;
+  final double? cacheExtent;
+  final DragStartBehavior dragStartBehavior;
+  final ScrollViewKeyboardDismissBehavior keyboardDismissBehavior;
+  final String? restorationId;
+  final Clip clipBehavior;
+
   @override
   Widget build(BuildContext context) {
     return TwoWayCustomScrollView(
       center: controller.centerSliverKey,
       reverse: anchor == TwoWayListViewAnchor.bottom,
       slivers: _buildSlivers(),
+      controller: scrollController,
+      primary: primary,
+      physics: physics,
+      scrollBehavior: scrollBehavior,
+      cacheExtent: cacheExtent,
+      dragStartBehavior: dragStartBehavior,
+      keyboardDismissBehavior: keyboardDismissBehavior,
+      restorationId: restorationId,
+      clipBehavior: clipBehavior,
     );
   }
 
