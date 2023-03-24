@@ -1,3 +1,7 @@
+## 2.2.0
+
+- Added many of `TwoWayCustomScrollView` params into a `TwoWayListView` constructor.
+
 ## 2.1.0
 
 - Fixed `index` parameter value in `itemBuilder`

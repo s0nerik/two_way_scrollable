@@ -1,7 +1,7 @@
 name: two_way_scrollable
 description: A set of two-way growable widgets for Flutter that properly fill the viewport even if there is not enough content.
 homepage: https://github.com/s0nerik/two_way_scrollable
-version: 2.1.0
+version: 2.2.0
 
 environment:
   sdk: '>=2.19.0 <3.0.0'
