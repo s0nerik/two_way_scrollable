@@ -1,3 +1,7 @@
+## 2.2.1
+
+- Removed `@internal` annotation from `TwoWayListController.centerSliverKey`.
+
 ## 2.2.0
 
 - Added many of `TwoWayCustomScrollView` params into a `TwoWayListView` constructor.

@@ -40,7 +40,6 @@ class TwoWayListController<T> with ChangeNotifier {
     debugLabel: 'TwoWayList.topItemsAnimatedListSliver',
   );
 
-  @internal
   final centerSliverKey = GlobalKey(
     debugLabel: 'TwoWayList.centerSliver',
   );
