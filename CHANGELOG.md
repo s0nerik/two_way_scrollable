@@ -1,3 +1,7 @@
+## 2.2.2
+
+- `TwoWayListController.insert` and `TwoWayListController.remove` now work even if the `TwoWayListView`/`SliverTwoWayList` is not shown yet.
+
 ## 2.2.1
 
 - Removed `@internal` annotation from `TwoWayListController.centerSliverKey`.
